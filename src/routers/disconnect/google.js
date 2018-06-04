@@ -4,7 +4,7 @@
 const router = require('express').Router()
 const models = require('../../db/models').models
 
-function DisconnectGithub(req, res) {
+function DisconnectGoogle(req, res) {
 
     let existingUser = req.user
 
@@ -15,7 +15,7 @@ function DisconnectGithub(req, res) {
     }
     else {
 
-        models.UserGithub.destroy({
+        models.UserGoogle.destroy({
             where: {userId: req.user.id}
         })
             .then(function (result) {
@@ -23,7 +23,7 @@ function DisconnectGithub(req, res) {
             })
             .catch((err) => {
                 Raven.captureException(err)
-                res.status(503).send({message: "There was an error disconnecting Github."})
+                res.status(503).send({message: "There was an error disconnecting Google."})
             })
 
     }
@@ -31,4 +31,4 @@ function DisconnectGithub(req, res) {
 }
 
 
-module.exports = DisconnectGithub
+module.exports = DisconnectGoogle

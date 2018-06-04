@@ -19,7 +19,7 @@ module.exports = {
         username: {type: Sequelize.DataTypes.STRING, allowNull: true}
     },
 
-    github: {
+    google: {
         id: {type: Sequelize.DataTypes.BIGINT, primaryKey: true},
         token: Sequelize.DataTypes.STRING,
         tokenSecret: {type: Sequelize.DataTypes.STRING, allowNull: true},
@@ -31,7 +31,7 @@ module.exports = {
         roll_number: Sequelize.DataTypes.STRING,
         accessToken: Sequelize.DataTypes.STRING,
         course_identifier: Sequelize.DataTypes.STRING,
-        courses: Sequelize.DataTypes.JSONB
+        // courses: Sequelize.DataTypes.JSONB
     }
 
 }

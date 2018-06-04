@@ -9,6 +9,6 @@ const router = require('express').Router()
 router.use('/', require('./local'))
 router.use('/facebook', require('./facebook'))
 router.use('/twitter', require('./twitter'))
-router.use('/github', require('./github'))
+router.use('/google', require('./google'))
 
 module.exports = router

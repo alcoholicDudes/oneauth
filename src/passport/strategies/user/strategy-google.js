@@ -2,7 +2,7 @@
  * Created by championswimmer on 07/05/17.
  */
 const Raven = require('raven')
-const GithubStrategy = require('passport-github2').Strategy
+const GoogleStrategy = require('passport-google-oauth20').Strategy
 
 const models = require('../../../db/models').models
 
@@ -14,28 +14,29 @@ const passutils = require('../../../utils/password')
  * Authenticate _users_ using their Github Accounts
  */
 
-module.exports = new GithubStrategy({
-    clientID: secrets.GITHUB_CONSUMER_KEY,
-    clientSecret: secrets.GITHUB_CONSUMER_SECRET,
-    callbackURL: config.SERVER_URL + config.GITHUB_CALLBACK,
+module.exports = new GoogleStrategy({
+    clientID: secrets.GOOGLE_CONSUMER_KEY,
+    clientSecret: secrets.GOOGLE_CONSUMER_SECRET,
+    callbackURL: config.SERVER_URL + config.GOOGLE_CALLBACK,
     passReqToCallback: true
 }, function (req, token, tokenSecret, profile, cb) {
+
     let profileJson = profile._json
     let oldUser = req.user
-    Raven.setContext({extra: {file: 'githubstrategy'}})
+    Raven.setContext({extra: {file: 'googlestrategy'}})
     if (oldUser) {
-        if (config.DEBUG) console.log('User exists, is connecting Github account')
-        models.UserGithub.findOne({where: {id: profileJson.id}})
-            .then((ghaccount) => {
-                if (ghaccount) {
-                    throw new Error('Your Github account is already linked with codingblocks account Id: ' + ghaccount.dataValues.userId)
+        if (config.DEBUG) console.log('User exists, is connecting Google account')
+        models.UserGoogle.findOne({where: {id: profileJson.id}})
+            .then((goaccount) => {
+                if (goaccount) {
+                    throw new Error('Your Google account is already linked with codingblocks account Id: ' + goaccount.dataValues.userId)
                 }
                 else {
-                    models.UserGithub.upsert({
+                    models.UserGoogle.upsert({
                         id: profileJson.id,
                         token: token,
                         tokenSecret: tokenSecret,
-                        username: profileJson.login,
+                        username: profileJson.displayName,
                         userId: oldUser.id
                     })
                         .then(function (updated) {
@@ -52,32 +53,33 @@ module.exports = new GithubStrategy({
             })
     }
     else {
-        models.User.count({where: {username: profileJson.login}})
+        models.User.count({where: {username: profileJson.displayName}})
             .then(function (existCount) {
 
-                return models.UserGithub.findCreateFind({
+                return models.UserGoogle.findCreateFind({
+
                     include: [models.User],
                     where: {id: profileJson.id},
                     defaults: {
                         id: profileJson.id,
                         token: token,
                         tokenSecret: tokenSecret,
-                        username: profileJson.login,
+                        username: profileJson.displayName,
                         user: {
-                            username: existCount === 0 ? profileJson.login : profileJson.login + "-gh",
-                            firstname: profileJson.name ? profileJson.name.split(' ')[0] : profileJson.login,
-                            lastname: profileJson.name ? profileJson.name.split(' ').pop() : profileJson.login,
-                            email: profileJson.email,
-                            photo: profileJson.avatar_url
+                            username: existCount === 0 ? profileJson.displayName : profileJson.displayName + "-go",
+                            firstname: profileJson.displayName ? profileJson.name.givenName : profileJson.displayName,
+                            lastname: profileJson.displayName ? profileJson.name.familyName : "",
+                            email: profileJson.emails[0].value,
+                            photo: profileJson.image.url
                         }
                     }
                 })
-            }).spread(function (userGithub, created) {
+            }).spread(function (userGoogle, created) {
             //TODO: Check created == true for first time
-            if (!userGithub) {
+            if (!userGoogle) {
                 return cb(null, false, {message: 'Authentication Failed'})
             }
-            return cb(null, userGithub.user.get())
+            return cb(null, userGoogle.user.get())
         }).catch((err) => {
             Raven.captureException(err)
         })

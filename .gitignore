@@ -50,3 +50,4 @@ secrets.json
 
 # New Relic
 newrelic_agent.log
+\.idea/

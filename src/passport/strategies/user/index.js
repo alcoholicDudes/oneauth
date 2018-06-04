@@ -8,8 +8,8 @@ const fbStrategy = require('./strategy-facebook')
 
 const twitterStrategy = require('./strategy-twitter')
 
-const githubStrategy = require('./strategy-github')
+const googleStrategy = require('./strategy-google')
 
 const lmsStrategy = require('./strategy-lms')
 
-module.exports = {localStrategy, fbStrategy, twitterStrategy, githubStrategy, lmsStrategy}
+module.exports = {localStrategy, fbStrategy, twitterStrategy, googleStrategy, lmsStrategy}

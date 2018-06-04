@@ -1,7 +1,7 @@
 /**
  * Created by championswimmer on 08/03/17.
  */
-require('newrelic')
+// require('newrelic')
 const express = require('express')
     , bodyParser = require('body-parser')
     , session = require('express-session')
@@ -25,14 +25,14 @@ const config = require('../config')
     , oauthrouter = require('./routers/oauthrouter')
     , pagerouter = require('./routers/pages')
     , statusrouter = require('./routers/statusrouter')
-    , {expresstracer, datadogRouter} = require('./utils/ddtracer')
-    , {expressLogger} = require('./utils/logger'),
+    // , {expresstracer, datadogRouter} = require('./utils/ddtracer')
+    // , {expressLogger} = require('./utils/logger'),
       handlebarsHelpers = require('./utils/handlebars');
 
 const app = express()
 
 // ============== START DATADOG
-app.use(expresstracer)
+// app.use(expresstracer)
 // ================= END DATADOG
 const redirectToHome = function (req, res, next) {
 
@@ -69,7 +69,7 @@ app.engine('hbs', exphbs.express4({
 app.set('views', path.join(__dirname, '../views'))
 app.set("view engine", "hbs")
 
-app.use(expressLogger)
+// app.use(expressLogger)
 app.use(express.static(path.join(__dirname, '../public_static')))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
@@ -88,7 +88,7 @@ app.use(passport.session())
 app.use(setuserContext)
 app.use(redirectToHome)
 app.use(expressGa('UA-83327907-7'))
-app.use(datadogRouter)
+// app.use(datadogRouter)
 app.use('/login', loginrouter)
 app.use('/connect', connectrouter)
 app.use('/disconnect', disconnectrouter)
@@ -102,10 +102,11 @@ app.use('/', pagerouter)
 
 app.use(Raven.errorHandler())
 
-if(process.env.ONEAUTH_DEV === 'localhost'){
+// if(process.env.ONEAUTH_DEV === 'localhost'){
     Raven.captureException = (E) => console.error (E)
-}
+// }
 
 app.listen(process.env.PORT || 3838, function () {
+    console.log("server at "+config.SERVER_URL)
     debug("Listening on " + config.SERVER_URL)
 })

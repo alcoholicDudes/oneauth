@@ -10,10 +10,11 @@ const db_user = secrets.DB.USER
 const db_pass = secrets.DB.PASSWORD
 const db_host = secrets.DB.HOST
 
-const DATABASE_URL = process.env.DATABASE_URL || ('postgres://' + db_user + ":" + db_pass + "@" + db_host + ":5432/" + db_name)
+const DATABASE_URL = process.env.DATABASE_URL || ('mysql://' + db_user + ":" + db_pass + "@" + db_host + ":5432/" + db_name)
 
-const db = new Sequelize(DATABASE_URL, {
-    dialect: 'postgres',
+const db = new Sequelize(db_name, db_user, db_pass, {
+    host: 'localhost',
+    dialect: 'mysql',
     pool: {
         max: 5,
         min: 0,
@@ -53,7 +54,7 @@ const Verifyemail = db.define('verifyemail', {
 const UserLocal = db.define('userlocal', definitions.social.local)
 const UserFacebook = db.define('userfacebook', definitions.social.facebook)
 const UserTwitter = db.define('usertwitter', definitions.social.twitter)
-const UserGithub = db.define('usergithub', definitions.social.github)
+const UserGoogle = db.define('usergoogle', definitions.social.google)
 const UserLms = db.define('userlms', definitions.social.lms)
 
 UserLocal.belongsTo(User)
@@ -65,8 +66,8 @@ User.hasOne(UserFacebook)
 UserTwitter.belongsTo(User)
 User.hasOne(UserTwitter)
 
-UserGithub.belongsTo(User)
-User.hasOne(UserGithub)
+UserGoogle.belongsTo(User)
+User.hasOne(UserGoogle)
 
 UserLms.belongsTo(User)
 User.hasOne(UserLms)
@@ -78,8 +79,8 @@ const Client = db.define('client', {
     id: {type: Sequelize.DataTypes.BIGINT, primaryKey: true},
     name: Sequelize.DataTypes.STRING,
     secret: Sequelize.DataTypes.STRING,
-    domain: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.STRING),
-    callbackURL: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.STRING),
+    // domain: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.STRING),
+    // callbackURL: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.STRING),
     trusted: {type: Sequelize.DataTypes.BOOLEAN, default: false}
 
 })
@@ -100,7 +101,7 @@ Client.hasMany(GrantCode)
 
 const AuthToken = db.define('authtoken', {
     token: {type: Sequelize.DataTypes.STRING, primaryKey: true},
-    scope: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.STRING),
+    // scope: Sequelize.DataTypes.ARRAY(Sequelize.DataTypes.STRING),
     explicit: {type: Sequelize.DataTypes.BOOLEAN, default: false}
 })
 
@@ -168,7 +169,7 @@ if (!process.env.ONEAUTH_DB_NO_SYNC) {
 
 module.exports = {
     models: {
-        User, UserLocal, UserFacebook, UserTwitter, UserGithub, UserLms,
+        User, UserLocal, UserFacebook, UserTwitter, UserGoogle, UserLms,
         Client, GrantCode, AuthToken, Resetpassword, Verifyemail,
         Demographic, Address, College, Company, Branch, State, Country
     },
